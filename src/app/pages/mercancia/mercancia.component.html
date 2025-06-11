@@ -1,0 +1,97 @@
+
+<!-- tabla de los platos registrados y ventana modal para registrar platos  -->
+<div class="container">
+    <h1 class="title" style="display: flex;justify-content: center;">Mercancia Diaria Total
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1D3A6C">
+            <path
+              d="m480-560-56-56 63-64H320v-80h167l-64-64 57-56 160 160-160 160ZM280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z" />
+          </svg>
+    </h1>
+    <button class="button is-primary" [routerLink]="'/rmercancia'">
+        <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                fill="#fff">
+                <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z" />
+            </svg></span> Volver
+    </button>
+        <!-- filtro por fecha -->
+        <div class="filter-container">
+            <input type="date" id="filtroFecha" [(ngModel)]="filtroFecha" class="input" (ngModelChange)="filtrarPorFecha()" />
+        </div>
+    <!-- Tabla dentro de un cuadro redondeado -->
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let mercancia of mercanciasPorFecha">
+                    <td>{{ mercancia.fecha | date:'dd/MM/yyyy'}}</td>
+                    <td>${{ mercancia.total }}</td>
+                    <td class="flex justify-center">
+                        <div class="flex space-x-4">
+                            <button
+                                class="middle none center rounded-lg bg-blue-500 py-2 px-3 font-sans text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-red-blue/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                data-ripple-light="true" (click)="abrirModalDetalles(mercancia)">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
+                                    width="24px" fill="#fff">
+                                    <path
+                                        d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Ventana modal para mostrar los detalles de la mercancia -->
+<div class="modal" [ngClass]="{'is-active': modalActivo && tipoModal == 'detalles'}">
+    <div class="modal-background" (click)="cerrarModal()"></div>
+    <div class="modal-content">
+        <div class="box">
+            <h1 class="title">Detalles de la Mercancía</h1>
+            <p><strong>Fecha:</strong> {{ fechaSeleccionada | date:'dd/MM/yyyy'}}</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Proveedor</th>
+                        <th>Producto</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollable-tbody">
+                    <tr *ngFor="let mercancia of mercancias">
+                        <td>{{ mercancia.proveedor }}</td>
+                        <td>{{ mercancia.producto }}</td>
+                        <td>{{ mercancia.descripcion }}</td>
+                        <td>${{ mercancia.precio.toLocaleString('es-ES') }}</td>
+                        <td class="detalles-item">
+                            <span
+                                [ngClass]="{'text-green-500': mercancia.estado == 1, 'text-red-500': mercancia.estado == 0}">
+                                {{ mercancia.estado == 0 ? 'Anulado' : (mercancia.estado == 1 ? 'Activo' : 'N/A') }}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>Total:</strong> ${{ totalPorFecha }}</p>
+            <div class="is-grouped buttons">
+                <button class="button is-primary transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" (click)="cerrarModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- stylesheet -->
+<link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css" />
+
+<!-- Ripple Effect from cdn -->
+<script src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>

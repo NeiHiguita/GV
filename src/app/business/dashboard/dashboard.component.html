@@ -1,0 +1,40 @@
+
+<div class="container">
+    <h1 class="title">Dashboard de Facturas</h1>
+  
+    <!-- Filtro por fecha -->
+  
+    <!-- Total de ganancias -->
+    <div class="detalles-column" style="margin-left: 0px;height: 60px;">
+        <div class="filter-container" style="position: relative;margin-right: 150px;margin-top: -10px;">
+            <input
+              type="date"
+              [(ngModel)]="fechaSeleccionada"
+              class="input"
+              placeholder="Seleccionar fecha"
+            />
+            <button class="button is-primary" (click)="filtrarGanancias()">Filtrar</button>
+            <button class="button is-primary" (click)="limpiarFiltro()">Limpiar</button>
+          </div>
+    </div>
+  
+    <!-- Gráfico de barras -->
+    <div class="table-container" style="margin-right: 500px;">
+        <p class="">Total de ganancias diarias</p>
+        <hr>
+        <canvas #barChart></canvas>
+    </div>
+  
+    <!-- Gráfico circular -->
+    <div class="table-container " style="margin-left: 550px; margin-top: -305px;max-height: 330px;">
+        <p class="">Total global por proceso</p>
+        <hr>
+      <canvas style="margin-left: 100px;max-height: 260px;" #pieChart></canvas>
+    </div>
+  </div>
+
+<!-- stylesheet -->
+<link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css" />
+
+<!-- Ripple Effect from cdn -->
+<script src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>

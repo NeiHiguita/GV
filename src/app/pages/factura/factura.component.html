@@ -1,0 +1,168 @@
+
+<!-- tabla de los platos registrados y ventana modal para registrar platos  -->
+<div class="container">
+    <h1 class="title" style="display: flex;justify-content: center;">Factura Diaria Total
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1D3A6C">
+        <path
+          d="M240-80q-50 0-85-35t-35-85v-120h120v-560l60 60 60-60 60 60 60-60 60 60 60-60 60 60 60-60 60 60 60-60v680q0 50-35 85t-85 35H240Zm480-80q17 0 28.5-11.5T760-200v-560H320v440h360v120q0 17 11.5 28.5T720-160ZM360-600v-80h240v80H360Zm0 120v-80h240v80H360Zm320-120q-17 0-28.5-11.5T640-640q0-17 11.5-28.5T680-680q17 0 28.5 11.5T720-640q0 17-11.5 28.5T680-600Zm0 120q-17 0-28.5-11.5T640-520q0-17 11.5-28.5T680-560q17 0 28.5 11.5T720-520q0 17-11.5 28.5T680-480ZM240-160h360v-80H200v40q0 17 11.5 28.5T240-160Zm-40 0v-80 80Z" />
+      </svg>
+    </h1>
+    <button class="button is-primary" [routerLink]="'/rfactura'">
+        <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                fill="#fff">
+                <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z" />
+            </svg></span> Volver
+    </button>
+    <div class="filter-container">
+        <input type="date" id="filtroFecha" [(ngModel)]="filtroFecha" class="input"
+            (ngModelChange)="filtrarPorFecha()" />
+    </div>
+    <!-- Tabla dentro de un cuadro redondeado -->
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Total Facturado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let factura of facturasPorFecha">
+                    <td>{{ factura.fecha | date:'dd/MM/yyyy'}}</td>
+                    <td>${{ factura.totalfac }}</td>
+                    <td class="flex justify-center">
+                        <div class="flex space-x-4">
+                            <button
+                                class="middle none center rounded-lg bg-blue-500 py-2 px-3 font-sans text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-orange-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                data-ripple-light="true" (click)="abrirModalDetalles(factura)">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
+                                    width="24px" fill="#fff">
+                                    <path
+                                        d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z" />
+                                </svg>
+                            </button>
+
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Ventana modal para mostrar los detalles de la factura -->
+<div class="modal" [ngClass]="{'is-active': modalActivo && tipoModal == 'detalles'}">
+    <div class="modal-background" (click)="cerrarModal()"></div>
+    <div class="modal-content">
+        <div class="box">
+            <h1 class="title">Detalles del total de las Facturas</h1>
+            <p><strong>Fecha:</strong> {{ fechaSeleccionada | date:'dd/MM/yyyy'}}</p>
+            <!-- tabla de facturas registradas -->
+            <table class="table" *ngIf="mostrarTablaFacturas">
+                <thead>
+                    <tr>
+                        <th>Tipo de Proceso</th>
+                        <th>Subtotal</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollable-tbody">
+                    <tr *ngFor="let factura of facturas">
+                        <td class="detalles-item"><span
+                                [ngClass]="{'text-red-500': factura.tipo_proceso == 'Inversion'}">
+                                {{ factura.tipo_proceso}}</span></td>
+                        <td>${{ factura.subtotal }}</td>
+                        <td>{{ factura.descripcion == '' ? '"sin descripcion"' : factura.descripcion}}</td>
+                        <td class="detalles-item">
+                            <span
+                                [ngClass]="{'text-green-500': factura.estado == 1, 'text-red-500': factura.estado == 0}">
+                                {{ factura.estado == 0 ? 'Anulado' : (factura.estado == 1 ? 'Activo' : 'N/A') }}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- tabla de observaciones -->
+            <table class="table" *ngIf="!mostrarTablaFacturas">
+                <thead>
+                    <tr>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollable-tbody">
+                    <tr *ngFor="let observacion of observacionFiltrados">
+                        <td>{{ observacion.observaciont }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <hr>
+            <div class="flex justify-between totales">
+                <div class="factura-container">
+                    <p><strong>Total Facturado:</strong> <span class="value">${{totalFacturado}}</span></p>
+                    <p><strong class="text-red-500">Total Inversion:</strong> <span
+                            class="value">${{totalinversion}}</span></p>
+                    <p><strong class="text-green-500">Total Ganacias:</strong> <span
+                            class="value">${{totalPorFecha}}</span></p>
+                    <p><strong></strong> <span class="value"></span>&nbsp;</p>
+                </div>
+                <!-- total por tipo de proceso -->
+                <div class="factura-container">
+                    <p><strong>Total Venta:</strong> <span class="value">${{totalven}}</span></p>
+                    <p><strong>Total Domicilio:</strong> <span class="value">${{totaldomicilio}}</span></p>
+                    <p><strong>Total Transferencia:</strong> <span class="value">${{totaltransferencia}}</span></p>
+                    <p><strong>Total Otro:</strong> <span class="value">${{totalot}}</span></p>
+                </div>
+                <div class="factura-container">
+                    <p><strong># de Ventas:</strong> {{ totalCVentas }}</p>
+                    <p><strong># de Domicilios:</strong> {{ totalCDomicilios }}</p>
+                    <p><strong># de Transferencias:</strong> {{ totalCTransferencias }}</p>
+                    <p><strong># de Otro:</strong> {{ totalCOtros }}</p>
+                </div>
+            </div>
+            <div class="btns">
+                <button
+                    class="button is-primary transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                    (click)="cerrarModal()">Cerrar
+                </button>
+                <button
+                    class="middle none center rounded-lg bg-red-500 py-2 px-3 font-sans text-xs font-bold uppercase text-white shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                    data-ripple-light="true" (click)="generarPDF()">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#fff">s
+                        <path
+                            d="M360-460h40v-80h40q17 0 28.5-11.5T480-580v-40q0-17-11.5-28.5T440-660h-80v200Zm40-120v-40h40v40h-40Zm120 120h80q17 0 28.5-11.5T640-500v-120q0-17-11.5-28.5T600-660h-80v200Zm40-40v-120h40v120h-40Zm120 40h40v-80h40v-40h-40v-40h40v-40h-80v200ZM320-240q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+                    </svg>
+
+                </button>
+                <button
+                class="button is-primary transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                (click)="alternarTablas()">
+                <!-- Mostrar el SVG según el estado de la tabla -->
+                <ng-container *ngIf="mostrarTablaFacturas; else mostrarFacturasIcono">
+                  <!-- SVG para mostrar observaciones -->
+                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#fff">
+                    <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/>
+                  </svg>
+                </ng-container>
+                <ng-template #mostrarFacturasIcono>
+                  <!-- SVG para mostrar facturas -->
+                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#fff">
+                    <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/>
+                  </svg>
+                </ng-template>
+              </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- stylesheet -->
+<link rel="stylesheet" href="https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css" />
+
+<!-- Ripple Effect from cdn -->
+<script src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>
